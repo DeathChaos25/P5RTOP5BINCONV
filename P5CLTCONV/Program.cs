@@ -400,6 +400,82 @@ namespace P5CLTCONV
                             }
                         }
                     }
+                    else if (arg0.Name.Contains("icon") || arg0.Name.Contains("parts")) //Thank you DC for the copy-paste Material
+                    {
+                        List<UInt32> StringPointers = new List<UInt32>();
+
+                        using (BinaryObjectReader P5RroadmapFile = new BinaryObjectReader(args[0], Endianness.Little, Encoding.GetEncoding(932)))
+                        {
+
+                            var savePath = Path.Combine(Path.GetDirectoryName(args[0]), "ConvertedOutput");
+                            System.IO.Directory.CreateDirectory(savePath);
+                            savePath = Path.Combine(savePath, Path.GetFileNameWithoutExtension(arg0.FullName) + ".bin");
+
+                            using (BinaryObjectWriter NewroadmapFile = new BinaryObjectWriter(savePath, Endianness.Little, Encoding.GetEncoding(932)))
+                            {
+                                for (int i = 0; i < P5RroadmapFile.Length / 72; i++)
+                                {
+                                    NewroadmapFile.Write(P5RroadmapFile.ReadInt32()); // s32 Map/Icon Id;
+                                    for (int iAgain = 0; iAgain < 6; iAgain++)
+                                    {
+                                        float resolutionThing = P5RroadmapFile.ReadSingle();
+                                        resolutionThing = resolutionThing * 0.6666666666666667f;
+                                        NewroadmapFile.Write(resolutionThing);
+                                    }
+
+                                    short BitFlag = 0;
+                                    short FlagSection = 0;
+
+                                    BitFlag = P5RroadmapFile.ReadInt16();
+                                    FlagSection = P5RroadmapFile.ReadInt16();
+
+                                    if (FlagSection == 0x1000)
+                                    {
+                                        BitFlag += 2048;
+                                        FlagSection = 0;
+                                    }
+                                    else if (FlagSection == 0x2000)
+                                    {
+                                        BitFlag += 4096;
+                                        FlagSection = 0;
+                                    }
+                                    else if (FlagSection == 0x3000)
+                                    {
+                                        BitFlag += 8192;
+                                        FlagSection = 0;
+                                    }
+                                    else if (FlagSection == 0x4000)
+                                    {
+                                        BitFlag += 8448;
+                                        FlagSection = 0;
+                                    }
+                                    else if (FlagSection == 0x5000)
+                                    {
+                                        BitFlag += 8704;
+                                        FlagSection = 0;
+                                    }
+
+                                    NewroadmapFile.Write(BitFlag); // s16 if_Bitflag_disabled;
+                                    NewroadmapFile.Write(FlagSection); // s16 Bitflag_related;
+                                    NewroadmapFile.Write(P5RroadmapFile.ReadInt32()); //Field20
+                                    NewroadmapFile.Write(P5RroadmapFile.ReadSingle()); //Field24
+                                    NewroadmapFile.Write(P5RroadmapFile.ReadSingle()); //Field28
+                                    NewroadmapFile.Write(P5RroadmapFile.ReadSingle()); //Field2C
+                                    NewroadmapFile.Write(P5RroadmapFile.ReadSingle()); //Field30
+                                    NewroadmapFile.Write(P5RroadmapFile.ReadSingle()); //Field34
+                                    NewroadmapFile.Write(P5RroadmapFile.ReadSingle()); //Field38
+                                    NewroadmapFile.Write(P5RroadmapFile.ReadSingle()); //Field3C
+                                    NewroadmapFile.Write(P5RroadmapFile.ReadSingle()); //Field40
+                                    NewroadmapFile.Write(P5RroadmapFile.ReadSingle()); //Field44
+
+                                }
+                                while (P5RroadmapFile.Position < P5RroadmapFile.Length) //write remainder of file without going past EOF
+                                {
+                                    NewroadmapFile.Write(P5RroadmapFile.ReadByte());
+                                }
+                            }
+                        }
+                    }
                     else
                     {
 
