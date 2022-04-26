@@ -416,7 +416,7 @@ namespace P5CLTCONV
                                 for (int i = 0; i < P5RroadmapFile.Length / 72; i++)
                                 {
                                     NewroadmapFile.Write(P5RroadmapFile.ReadInt32()); // s32 Map/Icon Id;
-                                    for (int iAgain = 0; iAgain < 6; iAgain++)
+                                    for (int j = 0; j < 6; j++)
                                     {
                                         float resolutionThing = P5RroadmapFile.ReadSingle();
                                         resolutionThing = resolutionThing * 0.6666666666666667f;
@@ -792,8 +792,96 @@ namespace P5CLTCONV
 
                     }
                 }
+                else if (arg0.Extension == ".spd")
+                {
+                    Console.WriteLine($"Attempting to convert { arg0.Name }");
+
+                    using (BinaryObjectReader P5RSPDFile = new BinaryObjectReader(args[0], Endianness.Little, Encoding.GetEncoding(932)))
+                    {
+
+                        var savePath = Path.Combine(Path.GetDirectoryName(args[0]), "ConvertedOutput");
+                        System.IO.Directory.CreateDirectory(savePath);
+                        savePath = Path.Combine(savePath, Path.GetFileNameWithoutExtension(arg0.FullName) + ".spd");
+
+                        using (BinaryObjectWriter NewSPDFile = new BinaryObjectWriter(savePath, Endianness.Little, Encoding.GetEncoding(932)))
+                        {
+                            NewSPDFile.Write(P5RSPDFile.ReadUInt32()); // File header
+                            NewSPDFile.Write(P5RSPDFile.ReadUInt32());
+                            int filesize = P5RSPDFile.ReadInt32();
+                            NewSPDFile.Write(filesize);
+                            NewSPDFile.Write(P5RSPDFile.ReadUInt32());
+                            NewSPDFile.Write(P5RSPDFile.ReadUInt32());
+                            short textureCount = P5RSPDFile.ReadInt16();
+                            NewSPDFile.Write(textureCount);
+
+                            ushort entryCount = P5RSPDFile.ReadUInt16();
+                            NewSPDFile.Write(entryCount);
+                            NewSPDFile.Write(P5RSPDFile.ReadUInt32());
+                            NewSPDFile.Write(P5RSPDFile.ReadUInt32());
+
+                            for (int j = 0; j < textureCount; j++)
+                            {
+                                for (int k = 0; k < 12; k++)
+                                {
+                                    NewSPDFile.Write(P5RSPDFile.ReadUInt32());
+                                }
+                            }
+
+                            for (int i = 0; i < entryCount; i++)
+                            {
+                                for (int l = 0; l < 8; l++)
+                                {
+                                    NewSPDFile.Write(P5RSPDFile.ReadUInt32());
+                                }
+                                float scale;
+                                if (arg0.Name.Contains("4K"))
+                                {
+                                    scale = 2f;
+                                }
+                                else
+                                {
+                                    scale = 0.6666666666666667f;
+                                }
+                                int spdX1 = P5RSPDFile.ReadInt32();
+                                NewSPDFile.Write(CheckAndDivideSPD(spdX1, scale));
+                                int spdY1 = P5RSPDFile.ReadInt32();
+                                NewSPDFile.Write(CheckAndDivideSPD(spdY1, scale));
+                                int spdX2 = P5RSPDFile.ReadInt32();
+                                NewSPDFile.Write(CheckAndDivideSPD(spdX2, scale));
+                                int spdY2 = P5RSPDFile.ReadInt32();
+                                NewSPDFile.Write(CheckAndDivideSPD(spdY2, scale));
+
+                                NewSPDFile.Write(P5RSPDFile.ReadUInt32());
+                                NewSPDFile.Write(P5RSPDFile.ReadUInt32());
+
+                                int spdXScale = P5RSPDFile.ReadInt32();
+                                NewSPDFile.Write(CheckAndDivideSPD(spdXScale, scale));
+                                int spdYScale = P5RSPDFile.ReadInt32();
+                                NewSPDFile.Write(CheckAndDivideSPD(spdYScale, scale));
+
+                                for (int m = 0; m < 24; m++)
+                                {
+                                    NewSPDFile.Write(P5RSPDFile.ReadUInt32());
+                                }
+
+                            }
+
+                        }
+
+                    }
+                }
                 else Console.WriteLine("https://youtu.be/Uuw6PdJvW88");
             }
+        }
+        static int CheckAndDivideSPD( int spdParam, float scale )
+        {
+            if (spdParam > 1)
+            {
+                float spdParamf = Convert.ToSingle(spdParam);
+                spdParamf *= scale;
+                return Convert.ToInt32(spdParamf);
+            }
+            return spdParam;
         }
     }
 }
