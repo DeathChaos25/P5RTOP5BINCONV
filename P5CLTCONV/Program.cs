@@ -296,29 +296,9 @@ namespace P5CLTCONV
 
                                         //Console.WriteLine($"FlagSection is {FlagSection}");
 
-                                        if (FlagSection == 0x1000)
+                                        if (FlagSection != -1 && BitFlag != -1)
                                         {
-                                            BitFlag += 2048;
-                                            FlagSection = 0;
-                                        }
-                                        else if (FlagSection == 0x2000)
-                                        {
-                                            BitFlag += 4096;
-                                            FlagSection = 0;
-                                        }
-                                        else if (FlagSection == 0x3000)
-                                        {
-                                            BitFlag += 8192;
-                                            FlagSection = 0;
-                                        }
-                                        else if (FlagSection == 0x4000)
-                                        {
-                                            BitFlag += 8448;
-                                            FlagSection = 0;
-                                        }
-                                        else if (FlagSection == 0x5000)
-                                        {
-                                            BitFlag += 8704;
+                                            BitFlag = ReturnConvertedFlag(FlagSection, BitFlag);
                                             FlagSection = 0;
                                         }
 
@@ -356,29 +336,9 @@ namespace P5CLTCONV
 
                                     //Console.WriteLine($"FlagSection is {FlagSection}");
 
-                                    if (FlagSection == 0x1000)
+                                    if (FlagSection != -1 && BitFlag != -1)
                                     {
-                                        BitFlag += 2048;
-                                        FlagSection = 0;
-                                    }
-                                    else if (FlagSection == 0x2000)
-                                    {
-                                        BitFlag += 4096;
-                                        FlagSection = 0;
-                                    }
-                                    else if (FlagSection == 0x3000)
-                                    {
-                                        BitFlag += 8192;
-                                        FlagSection = 0;
-                                    }
-                                    else if (FlagSection == 0x4000)
-                                    {
-                                        BitFlag += 8448;
-                                        FlagSection = 0;
-                                    }
-                                    else if (FlagSection == 0x5000)
-                                    {
-                                        BitFlag += 8704;
+                                        BitFlag = ReturnConvertedFlag(FlagSection, BitFlag);
                                         FlagSection = 0;
                                     }
 
@@ -429,29 +389,9 @@ namespace P5CLTCONV
 
                                     //Console.WriteLine($"FlagSection is {FlagSection}");
 
-                                    if (FlagSection == 0x1000)
+                                    if (FlagSection != -1 && BitFlag != -1)
                                     {
-                                        BitFlag += 2048;
-                                        FlagSection = 0;
-                                    }
-                                    else if (FlagSection == 0x2000)
-                                    {
-                                        BitFlag += 4096;
-                                        FlagSection = 0;
-                                    }
-                                    else if (FlagSection == 0x3000)
-                                    {
-                                        BitFlag += 8192;
-                                        FlagSection = 0;
-                                    }
-                                    else if (FlagSection == 0x4000)
-                                    {
-                                        BitFlag += 8448;
-                                        FlagSection = 0;
-                                    }
-                                    else if (FlagSection == 0x5000)
-                                    {
-                                        BitFlag += 8704;
+                                        BitFlag = ReturnConvertedFlag(FlagSection, BitFlag);
                                         FlagSection = 0;
                                     }
 
@@ -478,8 +418,20 @@ namespace P5CLTCONV
                                     NewFNTFile.Write(P5RFNTFile.ReadInt32()); // s32 PossiblyProcedureIndex2;
                                     NewFNTFile.Write(P5RFNTFile.ReadInt16()); // s16 Field_0x54;
                                     NewFNTFile.Write(P5RFNTFile.ReadInt16()); // s16 Field_0x56;
-                                    NewFNTFile.Write(P5RFNTFile.ReadInt16()); // s16 if_Bitflag_enabled;
-                                    NewFNTFile.Write(P5RFNTFile.ReadInt16()); // s16 Bitflag_related;
+
+
+                                    BitFlag = P5RFNTFile.ReadInt16(); // s16 Bitflag_enabled;
+                                    FlagSection = P5RFNTFile.ReadInt16(); // s16 flagsection;
+
+                                    if (FlagSection != -1 && BitFlag != -1)
+                                    {
+                                        BitFlag = ReturnConvertedFlag(FlagSection, BitFlag);
+                                        FlagSection = 0;
+                                    }
+
+                                    NewFNTFile.Write(BitFlag); // s16 if_Bitflag_disabled;
+                                    NewFNTFile.Write(FlagSection); // s16 Bitflag_related;
+
                                     NewFNTFile.Write(P5RFNTFile.ReadInt16()); // s16 Field_0x5C;
                                     NewFNTFile.Write(P5RFNTFile.ReadInt16()); // s16 Prompt_Name_Type;
                                     NewFNTFile.Write(P5RFNTFile.ReadInt32()); // s32 NPC_Prompt_Name;
@@ -596,29 +548,9 @@ namespace P5CLTCONV
 
                                 //Console.WriteLine($"FlagSection is {FlagSection}");
 
-                                if (FlagSection == 0x1000)
+                                if (FlagSection != -1 && BitFlag != -1)
                                 {
-                                    BitFlag += 2048;
-                                    FlagSection = 0;
-                                }
-                                else if (FlagSection == 0x2000)
-                                {
-                                    BitFlag += 4096;
-                                    FlagSection = 0;
-                                }
-                                else if (FlagSection == 0x3000)
-                                {
-                                    BitFlag += 8192;
-                                    FlagSection = 0;
-                                }
-                                else if (FlagSection == 0x4000)
-                                {
-                                    BitFlag += 8448;
-                                    FlagSection = 0;
-                                }
-                                else if (FlagSection == 0x5000)
-                                {
-                                    BitFlag += 8704;
+                                    BitFlag = ReturnConvertedFlag(FlagSection, BitFlag);
                                     FlagSection = 0;
                                 }
 
@@ -670,29 +602,9 @@ namespace P5CLTCONV
 
                                     //Console.WriteLine($"FlagSection is {FlagSection}");
 
-                                    if (FlagSection == 0x1000)
+                                    if (FlagSection != -1 && BitFlag != -1)
                                     {
-                                        BitFlag += 2048;
-                                        FlagSection = 0;
-                                    }
-                                    else if (FlagSection == 0x2000)
-                                    {
-                                        BitFlag += 4096;
-                                        FlagSection = 0;
-                                    }
-                                    else if (FlagSection == 0x3000)
-                                    {
-                                        BitFlag += 8192;
-                                        FlagSection = 0;
-                                    }
-                                    else if (FlagSection == 0x4000)
-                                    {
-                                        BitFlag += 8448;
-                                        FlagSection = 0;
-                                    }
-                                    else if (FlagSection == 0x5000)
-                                    {
-                                        BitFlag += 8704;
+                                        BitFlag = ReturnConvertedFlag(FlagSection, BitFlag);
                                         FlagSection = 0;
                                     }
 
@@ -718,6 +630,63 @@ namespace P5CLTCONV
                 }
                 else Console.WriteLine("https://youtu.be/Uuw6PdJvW88");
             }
+        }
+        static short ReturnConvertedFlag( int FlagSection, int BitFlag)
+        {
+            if ( FlagSection == 0 )
+            {
+                if ( BitFlag > 2048 )
+                {
+                    Console.WriteLine($"Warning: Flag Overflow from Section 0! Max: 2048 - Current:{BitFlag} - Overflow by { BitFlag - 2048 }");
+                }
+            }
+            else if (FlagSection == 0x1000)
+            {
+                if (BitFlag > 2048)
+                {
+                    Console.WriteLine($"Warning: Flag Overflow from Section 1! Max: 2048 - Current:{BitFlag} - Overflow by { BitFlag - 2048 }");
+                }
+                BitFlag += 2048;
+            }
+            else if (FlagSection == 0x2000)
+            {
+                if (BitFlag > 4096)
+                {
+                    Console.WriteLine($"Warning: Flag Overflow from Section 2! Max: 4096 - Current:{BitFlag} - Overflow by { BitFlag - 4096 }");
+                }
+                BitFlag += 4096;
+            }
+            else if (FlagSection == 0x3000)
+            {
+                if (BitFlag > 256)
+                {
+                    Console.WriteLine($"Warning: Flag Overflow from Section 3! Max: 256 - Current:{BitFlag} - Overflow by { BitFlag - 256 }");
+                }
+                BitFlag += 8192;
+            }
+            else if (FlagSection == 0x4000)
+            {
+                if (BitFlag > 256)
+                {
+                    Console.WriteLine($"Warning: Flag Overflow from Section 4! Max: 256 - Current:{BitFlag} - Overflow by { BitFlag - 256 }");
+                }
+                BitFlag += 8448;
+            }
+            else if (FlagSection == 0x5000)
+            {
+                if (BitFlag > 256)
+                {
+                    Console.WriteLine($"Warning: Flag Overflow from Section 5! Max: 256 - Current:{BitFlag} - Overflow by { BitFlag - 256 }");
+                }
+                BitFlag += 8704;
+            }
+
+            if ( BitFlag > 8959 )
+            {
+                Console.WriteLine($"Warning: Flag Overflow! Flag higer than possible P5 max flag! Max: 8959 - Current:{BitFlag} - Overflow by { BitFlag - 8959 }");
+            }
+
+            return (short)BitFlag;
         }
     }
 }
