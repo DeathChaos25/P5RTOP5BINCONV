@@ -870,6 +870,58 @@ namespace P5CLTCONV
 
                     }
                 }
+                else if (arg0.Extension == ".PCD")
+                {
+                    Console.WriteLine($"Attempting to convert { arg0.Name }");
+
+                    using (BinaryObjectReader P5RPCDFile = new BinaryObjectReader(args[0], Endianness.Little, Encoding.GetEncoding(932)))
+                    {
+
+                        var savePath = Path.Combine(Path.GetDirectoryName(args[0]), "ConvertedOutput");
+                        System.IO.Directory.CreateDirectory(savePath);
+                        savePath = Path.Combine(savePath, Path.GetFileNameWithoutExtension(arg0.FullName) + ".PCD");
+
+                        using (BinaryObjectWriter NewPCDFile = new BinaryObjectWriter(savePath, Endianness.Little, Encoding.GetEncoding(932)))
+                        {
+                            NewPCDFile.Write(P5RPCDFile.ReadUInt32()); // File header
+                            P5RPCDFile.ReadInt32();
+                            NewPCDFile.Write(67108865);
+
+                            for (int i = 0; i < 12; i++)
+                            {
+
+                                int value = P5RPCDFile.ReadInt32();
+                                NewPCDFile.Endianness = Endianness.Big;
+                                P5RPCDFile.Endianness = Endianness.Big;
+                                if (i == 1)
+                                {
+                                    NewPCDFile.Write((int)P5RPCDFile.Length + 12);
+                                }
+                                else
+                                {
+                                    NewPCDFile.Write(value);
+                                }
+                                NewPCDFile.Endianness = Endianness.Little;
+                                P5RPCDFile.Endianness = Endianness.Little;
+                            }
+                            for (int j = 0; j < (P5RPCDFile.Length - 58) / 4; j ++)
+                            {
+                                Single valuef = P5RPCDFile.ReadSingle();
+                                NewPCDFile.Endianness = Endianness.Big;
+                                P5RPCDFile.Endianness = Endianness.Big;
+                                NewPCDFile.Write(valuef);
+                                NewPCDFile.Endianness = Endianness.Little;
+                                P5RPCDFile.Endianness = Endianness.Little;
+                                if (j == 1)
+                                {
+                                    P5RPCDFile.ReadSingle();
+                                }
+                            }
+
+                        }
+
+                    }
+                }
                 else Console.WriteLine("https://youtu.be/Uuw6PdJvW88");
             }
         }
