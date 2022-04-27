@@ -645,16 +645,18 @@ namespace P5CLTCONV
                 if (BitFlag > 2048)
                 {
                     Console.WriteLine($"Warning: Flag Overflow from Section 1! Max: 2048 - Current:{BitFlag} - Overflow by { BitFlag - 2048 }");
+                    BitFlag -= 2048; // section size
+                    BitFlag += 8959; // p5 max
                 }
-                BitFlag += 2048;
+                else BitFlag += 2048;
             }
             else if (FlagSection == 0x2000)
             {
                 if (BitFlag > 4096)
                 {
-                    BitFlag -= 4096;
+                    Console.WriteLine($"Warning: Flag Overflow from Section 2! Max: 4096 - Current:{BitFlag} - Overflow by { BitFlag - 4096 }"); BitFlag -= 4096;  // section size
+                    BitFlag += 394; // section 1 overflow
                     BitFlag += 8959; // p5 max
-                    Console.WriteLine($"Warning: Flag Overflow from Section 2! Max: 4096 - Current:{BitFlag} - Overflow by { BitFlag - 4096 }");
                 }
                 else BitFlag += 4096;
             }
@@ -663,24 +665,39 @@ namespace P5CLTCONV
                 if (BitFlag > 256)
                 {
                     Console.WriteLine($"Warning: Flag Overflow from Section 3! Max: 256 - Current:{BitFlag} - Overflow by { BitFlag - 256 }");
+                    BitFlag -= 256; // section size
+                    BitFlag += 394; // section 1 overflow
+                    BitFlag += 1024; // section 2 overflow
+                    BitFlag += 8959; // p5 max
                 }
-                BitFlag += 8192;
+                else BitFlag += 8192;
             }
             else if (FlagSection == 0x4000)
             {
                 if (BitFlag > 256)
                 {
                     Console.WriteLine($"Warning: Flag Overflow from Section 4! Max: 256 - Current:{BitFlag} - Overflow by { BitFlag - 256 }");
+                    BitFlag -= 256; // section size
+                    BitFlag += 394; // section 1 overflow
+                    BitFlag += 1024; // section 2 overflow
+                    BitFlag += 256; // section 3 overflow
+                    BitFlag += 8959; // p5 max
                 }
-                BitFlag += 8448;
+                else BitFlag += 8448;
             }
             else if (FlagSection == 0x5000)
             {
                 if (BitFlag > 256)
                 {
                     Console.WriteLine($"Warning: Flag Overflow from Section 5! Max: 256 - Current:{BitFlag} - Overflow by { BitFlag - 256 }");
+                    BitFlag -= 256; // section size
+                    BitFlag += 394; // section 1 overflow
+                    BitFlag += 1024; // section 2 overflow
+                    BitFlag += 256; // section 3 overflow
+                    BitFlag += 256; // section 4 overflow
+                    BitFlag += 8959; // p5 max
                 }
-                BitFlag += 8704;
+                else BitFlag += 8704;
             }
 
             if ( BitFlag > 8959 )
