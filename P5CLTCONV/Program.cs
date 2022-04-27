@@ -398,15 +398,21 @@ namespace P5CLTCONV
                                     NewroadmapFile.Write(BitFlag); // s16 if_Bitflag_disabled;
                                     NewroadmapFile.Write(FlagSection); // s16 Bitflag_related;
                                     NewroadmapFile.Write(P5RroadmapFile.ReadInt32()); //Field20
-                                    NewroadmapFile.Write(P5RroadmapFile.ReadSingle()); //Field24
-                                    NewroadmapFile.Write(P5RroadmapFile.ReadSingle()); //Field28
-                                    NewroadmapFile.Write(P5RroadmapFile.ReadSingle()); //Field2C
-                                    NewroadmapFile.Write(P5RroadmapFile.ReadSingle()); //Field30
-                                    NewroadmapFile.Write(P5RroadmapFile.ReadSingle()); //Field34
-                                    NewroadmapFile.Write(P5RroadmapFile.ReadSingle()); //Field38
-                                    NewroadmapFile.Write(P5RroadmapFile.ReadSingle()); //Field3C
-                                    NewroadmapFile.Write(P5RroadmapFile.ReadSingle()); //Field40
-                                    NewroadmapFile.Write(P5RroadmapFile.ReadSingle()); //Field44
+                                    for (int k = 0; k < 8; k++)
+                                    {
+                                        float resolutionThing = P5RroadmapFile.ReadSingle();
+                                        resolutionThing = resolutionThing * 0.6666666666666667f;
+                                        if (arg0.Name.Contains("parts"))
+                                        {
+                                            NewroadmapFile.Write(resolutionThing);
+                                        }
+                                        else
+                                        {
+                                            NewroadmapFile.Write(P5RroadmapFile.ReadSingle());
+                                        }
+                                            
+                                    }
+                                    NewroadmapFile.Write(P5RroadmapFile.ReadInt32()); //Field44
 
                                 }
                                 while (P5RroadmapFile.Position < P5RroadmapFile.Length) //write remainder of file without going past EOF
