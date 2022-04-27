@@ -652,9 +652,11 @@ namespace P5CLTCONV
             {
                 if (BitFlag > 4096)
                 {
+                    BitFlag -= 4096;
+                    BitFlag += 8959; // p5 max
                     Console.WriteLine($"Warning: Flag Overflow from Section 2! Max: 4096 - Current:{BitFlag} - Overflow by { BitFlag - 4096 }");
                 }
-                BitFlag += 4096;
+                else BitFlag += 4096;
             }
             else if (FlagSection == 0x3000)
             {
