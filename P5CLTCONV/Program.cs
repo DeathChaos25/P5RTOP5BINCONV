@@ -823,6 +823,7 @@ namespace P5CLTCONV
                 else Console.WriteLine("https://youtu.be/Uuw6PdJvW88");
             }
         }
+
         static int CheckAndDivideSPD(int spdParam, float scale)
         {
             if (spdParam > 1)
@@ -834,11 +835,12 @@ namespace P5CLTCONV
             return spdParam;
         }
 
-        static short ReturnConvertedFlag(int FlagSection, int BitFlag)
+        static short ReturnConvertedFlag( int FlagSection, int BitFlag)
         {
-            if (FlagSection == 0)
+            if ( FlagSection == 0 )
             {
-                if (BitFlag > 2048)
+                if ( BitFlag > 2048 )
+
                 {
                     Console.WriteLine($"Warning: Flag Overflow from Section 0! Max: 2048 - Current:{BitFlag} - Overflow by { BitFlag - 2048 }");
                 }
@@ -902,8 +904,9 @@ namespace P5CLTCONV
                 }
                 else BitFlag += 8704;
             }
+          
+            if ( BitFlag > 8959 )
 
-            if (BitFlag > 8959)
             {
                 Console.WriteLine($"Warning: Flag Overflow! Flag higer than possible P5 max flag! Max: 8959 - Current:{BitFlag} - Overflow by { BitFlag - 8959 }");
             }
