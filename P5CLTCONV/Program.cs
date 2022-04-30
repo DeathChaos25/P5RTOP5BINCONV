@@ -29,7 +29,7 @@ namespace P5CLTCONV
                         uint CLTVersion = P5RCLTFile.ReadUInt32();
                         var P5ROnlyField = 0;
 
-                        if ( CLTVersion < 386008576 ) // P5R Version 0x17020600 
+                        if (CLTVersion < 386008576) // P5R Version 0x17020600 
                         {
                             Console.WriteLine("Invalid CLT Version, must be 0x17020600 or higher");
                             return;
@@ -75,7 +75,7 @@ namespace P5CLTCONV
                                 //float unk18 = P5RCLTFile.ReadSingle();
                                 NewCLTFile.Write(P5RCLTFile.ReadSingle());
 
-                                for ( int i = 0; i < Entry_Num -1; i++ )
+                                for (int i = 0; i < Entry_Num - 1; i++)
                                 {
                                     NewCLTFile.Write(P5RCLTFile.ReadUInt16()); // u16 Field00;
                                     NewCLTFile.Write(P5RCLTFile.ReadUInt16()); // u16 Field02;
@@ -100,7 +100,7 @@ namespace P5CLTCONV
                                         CrowdUnitAmount = 5;
                                     }
 
-                                    for ( int j = 0; j < CrowdUnitAmount; j++ )
+                                    for (int j = 0; j < CrowdUnitAmount; j++)
                                     {
                                         NewCLTFile.Write(P5RCLTFile.ReadInt16());
                                         NewCLTFile.Write(P5RCLTFile.ReadInt16());
@@ -121,7 +121,7 @@ namespace P5CLTCONV
                                     NewCLTFile.Write(P5RCLTFile.ReadSingle()); // f32 Field14;
 
                                     uint Conditional = P5RCLTFile.ReadUInt32();
-                                    if ( Conditional == 5 )
+                                    if (Conditional == 5)
                                     {
                                         Conditional = 2;
                                     }
@@ -134,7 +134,7 @@ namespace P5CLTCONV
                                     ushort NumOfPathingNodes2 = P5RCLTFile.ReadUInt16();
                                     NewCLTFile.Write(NumOfPathingNodes2); // u16 Num_of_Pathing_Nodes<comment= "First node is spawn point." >;
                                     NewCLTFile.Write(P5RCLTFile.ReadUInt16()); // u16 Field24;
-                                    for ( int j = 0; j < NumOfPathingNodes2; j++ )
+                                    for (int j = 0; j < NumOfPathingNodes2; j++)
                                     {
                                         NewCLTFile.Write(P5RCLTFile.ReadSingle());
                                         NewCLTFile.Write(P5RCLTFile.ReadSingle());
@@ -211,7 +211,7 @@ namespace P5CLTCONV
                                 }
                                 // additional data end
 
-                                if ( P5RCLTFile.Position >= P5RCLTFile.Length )
+                                if (P5RCLTFile.Position >= P5RCLTFile.Length)
                                 {
                                     Console.WriteLine("File Converted Successfully!");
                                     return;
@@ -244,7 +244,7 @@ namespace P5CLTCONV
                                     NewCLTFile.Write(P5RCLTFile.ReadUInt32()); // u32 Unk7;
                                     NewCLTFile.Write(P5RCLTFile.ReadUInt32()); // u32 Unk8;
                                 }
-                                for ( int d = 0; d < EntryNum; d++ )
+                                for (int d = 0; d < EntryNum; d++)
                                 {
                                     NewCLTFile.Write(P5RCLTFile.ReadSingle()); // f32 X_Coordinate;
                                     NewCLTFile.Write(P5RCLTFile.ReadSingle()); // f32 Y_Coordinate;
@@ -261,11 +261,11 @@ namespace P5CLTCONV
 
                     }
                 }
-                else if ( arg0.Extension == ".bin" )
+                else if (arg0.Extension == ".bin")
                 {
                     Console.WriteLine($"Attempting to convert { arg0.Name }");
 
-                    if ( arg0.Name.Contains("corptbl") )
+                    if (arg0.Name.Contains("corptbl"))
                     {
                         List<UInt32> StringPointers = new List<UInt32>();
 
@@ -289,7 +289,7 @@ namespace P5CLTCONV
                                     short BitFlag = 0;
                                     short FlagSection = 0;
 
-                                    for ( int j = 1; j <= 22; j++ )
+                                    for (int j = 1; j <= 22; j++)
                                     {
                                         BitFlag = P5RcorptblFile.ReadInt16();
                                         FlagSection = P5RcorptblFile.ReadInt16();
@@ -356,6 +356,68 @@ namespace P5CLTCONV
                                 while (P5RcorptblFile.Position < P5RcorptblFile.Length) //write remainder of file without going past EOF
                                 {
                                     NewcorptblFile.Write(P5RcorptblFile.ReadByte());
+                                }
+                            }
+                        }
+                    }
+                    else if (arg0.Name.Contains("icon") || arg0.Name.Contains("parts")) //Thank you DC for the copy-paste Material
+                    {
+                        List<UInt32> StringPointers = new List<UInt32>();
+
+                        using (BinaryObjectReader P5RroadmapFile = new BinaryObjectReader(args[0], Endianness.Little, Encoding.GetEncoding(932)))
+                        {
+
+                            var savePath = Path.Combine(Path.GetDirectoryName(args[0]), "ConvertedOutput");
+                            System.IO.Directory.CreateDirectory(savePath);
+                            savePath = Path.Combine(savePath, Path.GetFileNameWithoutExtension(arg0.FullName) + ".bin");
+
+                            using (BinaryObjectWriter NewroadmapFile = new BinaryObjectWriter(savePath, Endianness.Little, Encoding.GetEncoding(932)))
+                            {
+                                for (int i = 0; i < P5RroadmapFile.Length / 72; i++)
+                                {
+                                    NewroadmapFile.Write(P5RroadmapFile.ReadInt32()); // s32 Map/Icon Id;
+                                    for (int j = 0; j < 6; j++)
+                                    {
+                                        float resolutionThing = P5RroadmapFile.ReadSingle();
+                                        resolutionThing = resolutionThing * 0.6666666666666667f;
+                                        NewroadmapFile.Write(resolutionThing);
+                                    }
+
+                                    short BitFlag = 0;
+                                    short FlagSection = 0;
+
+                                    BitFlag = P5RroadmapFile.ReadInt16();
+                                    FlagSection = P5RroadmapFile.ReadInt16();
+
+                                    if (FlagSection != -1 && BitFlag != -1)
+                                    {
+                                        BitFlag = ReturnConvertedFlag(FlagSection, BitFlag);
+                                        FlagSection = 0;
+                                    }
+
+                                    NewroadmapFile.Write(BitFlag); // s16 if_Bitflag_disabled;
+                                    NewroadmapFile.Write(FlagSection); // s16 Bitflag_related;
+                                    NewroadmapFile.Write(P5RroadmapFile.ReadInt32()); //Field20
+                                    for (int k = 0; k < 8; k++)
+                                    {
+                                        float resolutionThing = P5RroadmapFile.ReadSingle();
+                                        resolutionThing = resolutionThing * 0.6666666666666667f;
+                                        if (arg0.Name.Contains("parts"))
+                                        {
+                                            NewroadmapFile.Write(resolutionThing);
+                                        }
+                                        else
+                                        {
+                                            NewroadmapFile.Write(P5RroadmapFile.ReadSingle());
+                                        }
+                                            
+                                    }
+                                    NewroadmapFile.Write(P5RroadmapFile.ReadInt32()); //Field44
+
+                                }
+                                while (P5RroadmapFile.Position < P5RroadmapFile.Length) //write remainder of file without going past EOF
+                                {
+                                    NewroadmapFile.Write(P5RroadmapFile.ReadByte());
                                 }
                             }
                         }
@@ -459,7 +521,7 @@ namespace P5CLTCONV
                             NewPDDFile.Write(P5RPDDFile.ReadUInt32());
                             NewPDDFile.Write(P5RPDDFile.ReadUInt32());
 
-                            for (int i = 0; i < ( P5RPDDFile.Length - 0x10) / 0x4c; i++)
+                            for (int i = 0; i < (P5RPDDFile.Length - 0x10) / 0x4c; i++)
                             {
                                 NewPDDFile.Write(P5RPDDFile.ReadUInt16()); // ushort Field00; // 0001 - enabled
                                 NewPDDFile.Write(P5RPDDFile.ReadUInt16()); // ushort Field02;
@@ -595,7 +657,7 @@ namespace P5CLTCONV
                                 short BitFlag = 0;
                                 short FlagSection = 0;
 
-                                for ( int j = 0; j < 6; j++ )
+                                for (int j = 0; j < 6; j++)
                                 {
                                     BitFlag = P5RHBNFile.ReadInt16();
                                     FlagSection = P5RHBNFile.ReadInt16();
@@ -628,14 +690,157 @@ namespace P5CLTCONV
 
                     }
                 }
+                else if (arg0.Extension == ".spd")
+                {
+                    Console.WriteLine($"Attempting to convert { arg0.Name }");
+
+                    using (BinaryObjectReader P5RSPDFile = new BinaryObjectReader(args[0], Endianness.Little, Encoding.GetEncoding(932)))
+                    {
+
+                        var savePath = Path.Combine(Path.GetDirectoryName(args[0]), "ConvertedOutput");
+                        System.IO.Directory.CreateDirectory(savePath);
+                        savePath = Path.Combine(savePath, Path.GetFileNameWithoutExtension(arg0.FullName) + ".spd");
+
+                        using (BinaryObjectWriter NewSPDFile = new BinaryObjectWriter(savePath, Endianness.Little, Encoding.GetEncoding(932)))
+                        {
+                            NewSPDFile.Write(P5RSPDFile.ReadUInt32()); // File header
+                            NewSPDFile.Write(P5RSPDFile.ReadUInt32());
+                            int filesize = P5RSPDFile.ReadInt32();
+                            NewSPDFile.Write(filesize);
+                            NewSPDFile.Write(P5RSPDFile.ReadUInt32());
+                            NewSPDFile.Write(P5RSPDFile.ReadUInt32());
+                            short textureCount = P5RSPDFile.ReadInt16();
+                            NewSPDFile.Write(textureCount);
+
+                            ushort entryCount = P5RSPDFile.ReadUInt16();
+                            NewSPDFile.Write(entryCount);
+                            NewSPDFile.Write(P5RSPDFile.ReadUInt32());
+                            NewSPDFile.Write(P5RSPDFile.ReadUInt32());
+
+                            for (int j = 0; j < textureCount; j++)
+                            {
+                                for (int k = 0; k < 12; k++)
+                                {
+                                    NewSPDFile.Write(P5RSPDFile.ReadUInt32());
+                                }
+                            }
+
+                            for (int i = 0; i < entryCount; i++)
+                            {
+                                for (int l = 0; l < 8; l++)
+                                {
+                                    NewSPDFile.Write(P5RSPDFile.ReadUInt32());
+                                }
+                                float scale;
+                                if (arg0.Name.Contains("4K"))
+                                {
+                                    scale = 2f;
+                                }
+                                else
+                                {
+                                    scale = 0.6666666666666667f;
+                                }
+                                int spdX1 = P5RSPDFile.ReadInt32();
+                                NewSPDFile.Write(CheckAndDivideSPD(spdX1, scale));
+                                int spdY1 = P5RSPDFile.ReadInt32();
+                                NewSPDFile.Write(CheckAndDivideSPD(spdY1, scale));
+                                int spdX2 = P5RSPDFile.ReadInt32();
+                                NewSPDFile.Write(CheckAndDivideSPD(spdX2, scale));
+                                int spdY2 = P5RSPDFile.ReadInt32();
+                                NewSPDFile.Write(CheckAndDivideSPD(spdY2, scale));
+
+                                NewSPDFile.Write(P5RSPDFile.ReadUInt32());
+                                NewSPDFile.Write(P5RSPDFile.ReadUInt32());
+
+                                int spdXScale = P5RSPDFile.ReadInt32();
+                                NewSPDFile.Write(CheckAndDivideSPD(spdXScale, scale));
+                                int spdYScale = P5RSPDFile.ReadInt32();
+                                NewSPDFile.Write(CheckAndDivideSPD(spdYScale, scale));
+
+                                for (int m = 0; m < 24; m++)
+                                {
+                                    NewSPDFile.Write(P5RSPDFile.ReadUInt32());
+                                }
+
+                            }
+
+                        }
+
+                    }
+                }
+                else if (arg0.Extension == ".PCD")
+                {
+                    Console.WriteLine($"Attempting to convert { arg0.Name }");
+
+                    using (BinaryObjectReader P5RPCDFile = new BinaryObjectReader(args[0], Endianness.Little, Encoding.GetEncoding(932)))
+                    {
+
+                        var savePath = Path.Combine(Path.GetDirectoryName(args[0]), "ConvertedOutput");
+                        System.IO.Directory.CreateDirectory(savePath);
+                        savePath = Path.Combine(savePath, Path.GetFileNameWithoutExtension(arg0.FullName) + ".PCD");
+
+                        using (BinaryObjectWriter NewPCDFile = new BinaryObjectWriter(savePath, Endianness.Little, Encoding.GetEncoding(932)))
+                        {
+                            NewPCDFile.Write(P5RPCDFile.ReadUInt32()); // File header
+                            P5RPCDFile.ReadInt32();
+                            NewPCDFile.Write(67108865);
+
+                            for (int i = 0; i < 12; i++)
+                            {
+
+                                int value = P5RPCDFile.ReadInt32();
+                                NewPCDFile.Endianness = Endianness.Big;
+                                P5RPCDFile.Endianness = Endianness.Big;
+                                if (i == 1)
+                                {
+                                    NewPCDFile.Write((int)P5RPCDFile.Length + 12);
+                                }
+                                else
+                                {
+                                    NewPCDFile.Write(value);
+                                }
+                                NewPCDFile.Endianness = Endianness.Little;
+                                P5RPCDFile.Endianness = Endianness.Little;
+                            }
+                            for (int j = 0; j < (P5RPCDFile.Length - 58) / 4; j++)
+                            {
+                                Single valuef = P5RPCDFile.ReadSingle();
+                                NewPCDFile.Endianness = Endianness.Big;
+                                P5RPCDFile.Endianness = Endianness.Big;
+                                NewPCDFile.Write(valuef);
+                                NewPCDFile.Endianness = Endianness.Little;
+                                P5RPCDFile.Endianness = Endianness.Little;
+                                if (j == 1)
+                                {
+                                    P5RPCDFile.ReadSingle();
+                                }
+                            }
+
+                        }
+
+                    }
+                }
                 else Console.WriteLine("https://youtu.be/Uuw6PdJvW88");
             }
         }
+
+        static int CheckAndDivideSPD(int spdParam, float scale)
+        {
+            if (spdParam > 1)
+            {
+                float spdParamf = Convert.ToSingle(spdParam);
+                spdParamf *= scale;
+                return Convert.ToInt32(spdParamf);
+            }
+            return spdParam;
+        }
+
         static short ReturnConvertedFlag( int FlagSection, int BitFlag)
         {
             if ( FlagSection == 0 )
             {
                 if ( BitFlag > 2048 )
+
                 {
                     Console.WriteLine($"Warning: Flag Overflow from Section 0! Max: 2048 - Current:{BitFlag} - Overflow by { BitFlag - 2048 }");
                 }
@@ -699,8 +904,9 @@ namespace P5CLTCONV
                 }
                 else BitFlag += 8704;
             }
-
+          
             if ( BitFlag > 8959 )
+
             {
                 Console.WriteLine($"Warning: Flag Overflow! Flag higer than possible P5 max flag! Max: 8959 - Current:{BitFlag} - Overflow by { BitFlag - 8959 }");
             }
