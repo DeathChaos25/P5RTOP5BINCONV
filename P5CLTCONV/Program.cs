@@ -820,7 +820,7 @@ namespace P5CLTCONV
 
                     }
                 }
-                else if ((arg0.Extension ==".ftd") && (arg0.Name.Contains("fldSaveDataPlace")))
+                else if ((arg0.Extension ==".ftd") && (arg0.Name.Contains("Place")))
                 {
                     Console.WriteLine($"Attempting to convert { arg0.Name }");
 
@@ -906,7 +906,7 @@ namespace P5CLTCONV
                             uint version = P5REnvFile.ReadUInt32();
                             if (version != 17846416 && version != 17846528)
                             {
-                                Console.WriteLine("Invalid Env Version: %x\n", version);
+                                Console.WriteLine("Invalid Env Version: " + version.ToString("X"));
                                 return;
                             }
                             NewEnvFile.Write(Magic);
@@ -975,7 +975,7 @@ namespace P5CLTCONV
                                 P5REnvFile.ReadByte();
                                 P5REnvFile.ReadUInt16();
                             }
-                            NewEnvFile.Write(P5REnvFile.ReadSingle() * 0.75f); //Bloom Amount?
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Bloom Amount? * 0.75
                             NewEnvFile.Write(P5REnvFile.ReadSingle()); //Bloom Detail?
                             NewEnvFile.Write(P5REnvFile.ReadSingle()); //Bloom White Level?
                             NewEnvFile.Write(P5REnvFile.ReadSingle()); //Bloom Dark Level?
