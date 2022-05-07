@@ -820,7 +820,7 @@ namespace P5CLTCONV
 
                     }
                 }
-                else if ((arg0.Extension ==".ftd") && (arg0.Name.Contains("Place")))
+                else if ((arg0.Extension ==".ftd") && (arg0.Name.Contains("fldSaveDataPlace")))
                 {
                     Console.WriteLine($"Attempting to convert { arg0.Name }");
 
