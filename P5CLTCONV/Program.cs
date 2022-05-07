@@ -902,8 +902,14 @@ namespace P5CLTCONV
 
                         using (BinaryObjectWriter NewEnvFile = new BinaryObjectWriter(savePath, Endianness.Big, Encoding.GetEncoding(932)))
                         {
-                            NewEnvFile.Write(P5REnvFile.ReadUInt32()); //Magic
-                            P5REnvFile.ReadUInt32();
+                            uint Magic = P5REnvFile.ReadUInt32(); //Magic
+                            uint version = P5REnvFile.ReadUInt32();
+                            if (version != 17846416 && version != 17846528)
+                            {
+                                Console.WriteLine("Invalid Env Version: %x\n", version);
+                                return;
+                            }
+                            NewEnvFile.Write(Magic);
                             NewEnvFile.Write(17846384); //Version
                             P5REnvFile.ReadUInt32();
                             NewEnvFile.Write((int)2); //File Type
@@ -960,13 +966,30 @@ namespace P5CLTCONV
                             NewEnvFile.Write(P5REnvFile.ReadByte()); //Enable Glare
                             NewEnvFile.Write((byte)0);
                             P5REnvFile.ReadUInt32();
-                            P5REnvFile.ReadUInt32();
+                            if (version == 17846528)
+                            {
+                                P5REnvFile.ReadUInt32();
+                            }
+                            else
+                            {
+                                P5REnvFile.ReadByte();
+                                P5REnvFile.ReadUInt16();
+                            }
                             NewEnvFile.Write(P5REnvFile.ReadSingle() * 0.75f); //Bloom Amount?
                             NewEnvFile.Write(P5REnvFile.ReadSingle()); //Bloom Detail?
                             NewEnvFile.Write(P5REnvFile.ReadSingle()); //Bloom White Level?
                             NewEnvFile.Write(P5REnvFile.ReadSingle()); //Bloom Dark Level?
                             NewEnvFile.Write(P5REnvFile.ReadSingle()); //Glare Sensivity?
-                            for (int i = 0; i < 88 / 4; i++)
+                            int loopCount;
+                            if (version == 17846528)
+                            {
+                                loopCount = 88;
+                            }
+                            else
+                            {
+                                loopCount = 80;
+                            }
+                            for (int i = 0; i < loopCount / 4; i++)
                             {
                                 P5REnvFile.ReadSingle(); //Royal Only Section
                             }

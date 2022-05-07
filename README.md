@@ -13,3 +13,4 @@ Currently supports the following file formats:
 - Field pac hit collision files (.HTB)
 - texture/icon SPD files
 - field pac camera PCD files (experimental)
+- Field Environment .ENV files
