@@ -401,14 +401,14 @@ namespace P5CLTCONV
                                     for (int k = 0; k < 8; k++)
                                     {
                                         float resolutionThing = P5RroadmapFile.ReadSingle();
-                                        resolutionThing = resolutionThing * 0.6666666666666667f;
+                                        float convertedResolutionThing = resolutionThing * 0.6666666666666667f;
                                         if (arg0.Name.Contains("parts"))
                                         {
-                                            NewroadmapFile.Write(resolutionThing);
+                                            NewroadmapFile.Write(convertedResolutionThing);
                                         }
                                         else
                                         {
-                                            NewroadmapFile.Write(P5RroadmapFile.ReadSingle());
+                                            NewroadmapFile.Write(resolutionThing);
                                         }
                                             
                                     }
@@ -816,6 +816,272 @@ namespace P5CLTCONV
                                 }
                             }
 
+                        }
+
+                    }
+                }
+                else if ((arg0.Extension ==".ftd") && (arg0.Name.Contains("Place")))
+                {
+                    Console.WriteLine($"Attempting to convert { arg0.Name }");
+
+                    using (BinaryObjectReader P5RNameFile = new BinaryObjectReader(args[0], Endianness.Big, Encoding.GetEncoding(932)))
+                    {
+
+                        var savePath = Path.Combine(Path.GetDirectoryName(args[0]), "ConvertedOutput");
+                        System.IO.Directory.CreateDirectory(savePath);
+                        savePath = Path.Combine(savePath, Path.GetFileNameWithoutExtension(arg0.FullName) + Path.GetExtension(arg0.Extension));
+
+                        using (BinaryObjectWriter NewNameFile = new BinaryObjectWriter(savePath, Endianness.Big, Encoding.GetEncoding(932)))
+                        {
+                            for (int i = 0; i < 9; i++)
+                            {
+                                NewNameFile.Write(P5RNameFile.ReadUInt32());
+                            }
+                            uint DataSize = P5RNameFile.ReadUInt32();
+                            uint EntryCount = P5RNameFile.ReadUInt32();
+                            uint EntrySize = DataSize / EntryCount;
+                            DataSize = ((EntrySize - 16) * EntryCount);
+                            NewNameFile.Write(DataSize);
+                            NewNameFile.Write(EntryCount);
+                            NewNameFile.Write(P5RNameFile.ReadUInt32());
+                            for (int i = 0; i < EntryCount; i++)
+                            {
+                                for (int j = 0; j < 9; j++)
+                                {
+                                    NewNameFile.Write(P5RNameFile.ReadUInt32());
+                                }
+
+                                for (int j = 0; j < 4; j++)
+                                {
+                                    P5RNameFile.ReadUInt32();
+                                }
+                            }
+                        }
+
+                    }
+                }
+                else if ((arg0.Extension == ".dat") && (arg0.Name.Contains("speaker")))
+                {
+                    Console.WriteLine($"Attempting to convert { arg0.Name }");
+
+                    using (BinaryObjectReader P5RNameFile = new BinaryObjectReader(args[0], Endianness.Big, Encoding.GetEncoding(932)))
+                    {
+
+                        var savePath = Path.Combine(Path.GetDirectoryName(args[0]), "ConvertedOutput");
+                        System.IO.Directory.CreateDirectory(savePath);
+                        savePath = Path.Combine(savePath, Path.GetFileNameWithoutExtension(arg0.FullName) + Path.GetExtension(arg0.Extension));
+
+                        using (BinaryObjectWriter NewNameFile = new BinaryObjectWriter(savePath, Endianness.Big, Encoding.GetEncoding(932)))
+                        {
+                            for (int i = 0; i < arg0.Length / 48; i++)
+                            {
+                                for (int j = 0; j < 8; j++)
+                                {
+                                    NewNameFile.Write(P5RNameFile.ReadUInt32());
+                                }
+
+                                for (int j = 0; j < 4; j++)
+                                {
+                                    P5RNameFile.ReadUInt32();
+                                }
+                            }
+                        }
+
+                    }
+                }
+                else if ((arg0.Extension == ".ENV"))
+                {
+                    Console.WriteLine($"Attempting to convert { arg0.Name }");
+
+                    using (BinaryObjectReader P5REnvFile = new BinaryObjectReader(args[0], Endianness.Big, Encoding.GetEncoding(932)))
+                    {
+
+                        var savePath = Path.Combine(Path.GetDirectoryName(args[0]), "ConvertedOutput");
+                        System.IO.Directory.CreateDirectory(savePath);
+                        savePath = Path.Combine(savePath, Path.GetFileNameWithoutExtension(arg0.FullName) + Path.GetExtension(arg0.Extension));
+
+                        using (BinaryObjectWriter NewEnvFile = new BinaryObjectWriter(savePath, Endianness.Big, Encoding.GetEncoding(932)))
+                        {
+                            uint Magic = P5REnvFile.ReadUInt32(); //Magic
+                            uint version = P5REnvFile.ReadUInt32();
+                            if (version != 17846416 && version != 17846528)
+                            {
+                                Console.WriteLine("Invalid Env Version: " + version.ToString("X"));
+                                return;
+                            }
+                            NewEnvFile.Write(Magic);
+                            NewEnvFile.Write(17846384); //Version
+                            P5REnvFile.ReadUInt32();
+                            NewEnvFile.Write((int)2); //File Type
+                            NewEnvFile.Write(P5REnvFile.ReadUInt32()); //Field0C
+                            NewEnvFile.Write(P5REnvFile.ReadInt16()); //Field10
+                            //Field Model Section
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Field Diffuse Red
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Field Diffuse Green
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Field Diffuse Blue
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Field Diffuse Alpha
+
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Field Ambient Red
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Field Ambient Green
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Field Ambient Blue
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Field Ambient Alpha
+
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Field Specular Red
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Field Specular Green
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Field Specular Blue
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Field Specular Alpha
+
+                            for (int i = 0; i < 232 / 4; i++)
+                            {
+                                NewEnvFile.Write(P5REnvFile.ReadSingle());
+                            }
+
+                            //Character Model Section
+
+                            NewEnvFile.Write(P5REnvFile.ReadInt16()); //Field10
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Diffuse Red
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Diffuse Green
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Diffuse Blue
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Diffuse Alpha
+
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Ambient Red
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Ambient Green
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Ambient Blue
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Ambient Alpha
+
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Specular Red
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Specular Green
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Specular Blue
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Specular Alpha
+
+                            for (int i = 0; i < 109; i++)
+                            {
+                                NewEnvFile.Write(P5REnvFile.ReadByte()); //Rest of the Character Model Section and Fog Section
+                            }
+
+                            //Lighting Section
+
+                            NewEnvFile.Write(P5REnvFile.ReadByte()); //Enable Graphical Output
+                            NewEnvFile.Write(P5REnvFile.ReadByte()); //Enable Bloom
+                            NewEnvFile.Write(P5REnvFile.ReadByte()); //Enable Glare
+                            NewEnvFile.Write((byte)0);
+                            P5REnvFile.ReadUInt32();
+                            if (version == 17846528)
+                            {
+                                P5REnvFile.ReadUInt32();
+                            }
+                            else
+                            {
+                                P5REnvFile.ReadByte();
+                                P5REnvFile.ReadUInt16();
+                            }
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Bloom Amount? * 0.75
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Bloom Detail?
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Bloom White Level?
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Bloom Dark Level?
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Glare Sensivity?
+                            int loopCount;
+                            if (version == 17846528)
+                            {
+                                loopCount = 88;
+                            }
+                            else
+                            {
+                                loopCount = 80;
+                            }
+                            for (int i = 0; i < loopCount / 4; i++)
+                            {
+                                P5REnvFile.ReadSingle(); //Royal Only Section
+                            }
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Glare Length
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Glare Chromatic Abberation
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Glare Direction
+                            NewEnvFile.Write(P5REnvFile.ReadInt32()); //Glare Mode
+
+                            //Unknown Section
+
+                            NewEnvFile.Write(P5REnvFile.ReadByte());
+                            P5REnvFile.ReadUInt32();
+                            NewEnvFile.Write(P5REnvFile.ReadSingle() / 4); //Field1F2
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Field1F6
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Field1FA
+                            NewEnvFile.Write(P5REnvFile.ReadByte()); //Field1FD
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Field1FE
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Field202
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Field206
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Field20A
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Field20E
+                            NewEnvFile.Write(P5REnvFile.ReadUInt32()); //Field212
+                            NewEnvFile.Write(P5REnvFile.ReadByte()); //Field216
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Field217
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Field21B
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Field21F
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Field223
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Field227
+                            NewEnvFile.Write(P5REnvFile.ReadByte()); //Field22B
+
+                            //Field Shadow Section
+
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Field Shadow Far Clip
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Field294
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Field298
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Field29C
+                            NewEnvFile.Write(P5REnvFile.ReadUInt32()); //Field2A0
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Field Shadow Near Clip
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Field Shadow Darkness
+                            NewEnvFile.Write(P5REnvFile.ReadUInt32()); 
+
+                            //Unknown Royal Section
+
+                            for (int i = 0; i < 4; i++)
+                            {
+                                P5REnvFile.ReadSingle();
+                            }
+
+                            //Color Grading Section
+
+                            NewEnvFile.Write(P5REnvFile.ReadByte());
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Red/Blue Levels
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Green/Pink Levels
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Blue/Yellow Levels
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Brightness Control
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Contrast Control
+
+                            //Second Unknown Section
+
+                            NewEnvFile.Write(P5REnvFile.ReadSingle());
+                            NewEnvFile.Write(P5REnvFile.ReadSingle());
+                            NewEnvFile.Write(P5REnvFile.ReadSingle());
+                            NewEnvFile.Write(P5REnvFile.ReadSingle());
+                            NewEnvFile.Write(P5REnvFile.ReadByte());
+                            NewEnvFile.Write(P5REnvFile.ReadSingle());
+                            NewEnvFile.Write(P5REnvFile.ReadSingle());
+                            NewEnvFile.Write(P5REnvFile.ReadSingle());
+                            NewEnvFile.Write(P5REnvFile.ReadSingle());
+                            NewEnvFile.Write(P5REnvFile.ReadSingle());
+                            NewEnvFile.Write(P5REnvFile.ReadSingle());
+
+                            //Physics Section
+
+                            NewEnvFile.Write(P5REnvFile.ReadByte());
+                            NewEnvFile.Write(P5REnvFile.ReadSingle());
+                            NewEnvFile.Write(P5REnvFile.ReadByte());
+                            NewEnvFile.Write(P5REnvFile.ReadSingle());
+                            NewEnvFile.Write(P5REnvFile.ReadSingle());
+                            NewEnvFile.Write(P5REnvFile.ReadSingle());
+                            NewEnvFile.Write(P5REnvFile.ReadSingle());
+                            NewEnvFile.Write(P5REnvFile.ReadSingle());
+                            NewEnvFile.Write(P5REnvFile.ReadSingle());
+                            NewEnvFile.Write(P5REnvFile.ReadSingle());
+
+                            //Sky Coloring
+
+                            NewEnvFile.Write(P5REnvFile.ReadByte()); //Red
+                            NewEnvFile.Write(P5REnvFile.ReadByte()); //Green
+                            NewEnvFile.Write(P5REnvFile.ReadByte()); //Blue
+                            NewEnvFile.Write(P5REnvFile.ReadByte()); //Alpha
+
+                            NewEnvFile.Write(P5REnvFile.ReadUInt32());
                         }
 
                     }
