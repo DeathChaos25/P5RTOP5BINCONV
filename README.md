@@ -14,5 +14,5 @@ Currently supports the following file formats:
 - texture/icon SPD files
 - field pac camera PCD files (experimental)
 - Field Environment .ENV files
-- Speaker.dat
+- speaker.dat
 - fldSaveDataPlace.ftd
