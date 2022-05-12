@@ -1041,11 +1041,11 @@ namespace P5CLTCONV
                             //Color Grading Section
 
                             NewEnvFile.Write(P5REnvFile.ReadByte());
-                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Red/Blue Levels
-                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Green/Pink Levels
-                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Blue/Yellow Levels
-                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Brightness Control
-                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Contrast Control
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Cyan
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Magenta
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Yellow
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Dodge
+                            NewEnvFile.Write(P5REnvFile.ReadSingle()); //Burn
 
                             //Second Unknown Section
 
