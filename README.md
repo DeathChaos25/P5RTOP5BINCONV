@@ -16,3 +16,4 @@ Currently supports the following file formats:
 - Field Environment .ENV files
 - speaker.dat
 - fldSaveDataPlace.ftd
+- Weather effect .bin files in the env folder
