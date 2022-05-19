@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using Amicitia.IO.Binary;
 
-namespace P5CLTCONV
+namespace P5RTOP5BINCONV
 {
     internal class Program
     {
@@ -12,7 +12,8 @@ namespace P5CLTCONV
         {
             if (args.Length == 0)
             {
-                System.Console.WriteLine("Usage:\nP5CLTCONV [path to CLT, FNT/ENT bin file, or shdPersona/Enemy pdd file]");
+                System.Console.WriteLine("P5RTOP5BINCONV [path to (supported file)]; currently supported Formats:\n- .CLT (crowd NPC files)\n- FNT/ENT .bin file (FNPC)\n- .bin file (icon parts, texpack, roadmap, weather binary or CorpTBL)\n-" +
+                    " shdPersona/Enemy pdd file\n- fldBGMCnd ftd\n- .HTB files (field pac hit trigger files)\n- .spd files (recalculates tex location)\n- speaker .dat file\n- .ENV files\n");
             }
             else
             {
@@ -917,70 +918,6 @@ namespace P5CLTCONV
                         }
 
                     }
-                }else if (arg0.Extension == ".ftd" && arg0.Name.Contains("fldBGMCnd"))
-                {
-                    Console.WriteLine($"Attempting to convert { arg0.Name }");
-
-                    using (BinaryObjectReader P5RFTDFile = new BinaryObjectReader(args[0], Endianness.Big, Encoding.GetEncoding(932)))
-                    {
-
-                        var savePath = Path.Combine(Path.GetDirectoryName(args[0]), "ConvertedOutput");
-                        System.IO.Directory.CreateDirectory(savePath);
-                        savePath = Path.Combine(savePath, Path.GetFileNameWithoutExtension(arg0.FullName) + ".ftd");
-
-                        using (BinaryObjectWriter NewFTDFile = new BinaryObjectWriter(savePath, Endianness.Big, Encoding.GetEncoding(932)))
-                        {
-                            NewFTDFile.Write(P5RFTDFile.ReadUInt32()); // File header
-                            NewFTDFile.Write(P5RFTDFile.ReadUInt32());
-                            NewFTDFile.Write(P5RFTDFile.ReadUInt32());
-                            NewFTDFile.Write(P5RFTDFile.ReadUInt32());
-
-                            NewFTDFile.Write(P5RFTDFile.ReadUInt32());
-                            NewFTDFile.Write(P5RFTDFile.ReadUInt32());
-                            NewFTDFile.Write(P5RFTDFile.ReadUInt32());
-                            NewFTDFile.Write(P5RFTDFile.ReadUInt32());
-
-
-                            NewFTDFile.Write(P5RFTDFile.ReadUInt32());
-                            NewFTDFile.Write(P5RFTDFile.ReadUInt32());
-
-                            var numOfEntries = P5RFTDFile.ReadUInt32();
-                            NewFTDFile.Write(numOfEntries);
-
-                            NewFTDFile.Write(P5RFTDFile.ReadUInt32());
-
-                            for (int i = 0; i < numOfEntries; i++)
-                            {
-                                NewFTDFile.Write(P5RFTDFile.ReadInt16()); // int16 fldMajorID;
-                                NewFTDFile.Write(P5RFTDFile.ReadInt16()); // int16 fldMinorID;
-                                NewFTDFile.Write(P5RFTDFile.ReadByte()); // MonthType monthStart;
-                                NewFTDFile.Write(P5RFTDFile.ReadByte()); // byte dayStart;
-                                NewFTDFile.Write(P5RFTDFile.ReadByte()); // MonthType monthEnd;
-                                NewFTDFile.Write(P5RFTDFile.ReadByte()); // byte dayEnd;
-                                NewFTDFile.Write(P5RFTDFile.ReadByte()); // byte Unk1;
-                                NewFTDFile.Write(P5RFTDFile.ReadByte()); // WeatherType Weather;
-                                NewFTDFile.Write(P5RFTDFile.ReadByte()); // byte unk_Flag;
-                                NewFTDFile.Write(P5RFTDFile.ReadByte()); // byte FF;
-                                NewFTDFile.Write(P5RFTDFile.ReadInt16()); // int16 unk;
-                                NewFTDFile.Write(P5RFTDFile.ReadInt16()); // MusicID musicID;
-                                //flag tomfoolery
-                                short FlagSection = P5RFTDFile.ReadInt16();
-                                short BitFlag = P5RFTDFile.ReadInt16();
-
-                                //Console.WriteLine($"FlagSection is {FlagSection}");
-
-                                if (FlagSection != -1 && BitFlag != -1)
-                                {
-                                    BitFlag = ReturnConvertedFlag(FlagSection, BitFlag);
-                                    FlagSection = 0;
-                                }
-
-                                NewFTDFile.Write(FlagSection); // s16 Bitflag_related;
-                                NewFTDFile.Write(BitFlag); // s16 if_Bitflag_disabled;
-                            }
-                        }
-
-                    }
                 }
                 else if (arg0.Extension == ".PCD")
                 {
@@ -1022,46 +959,6 @@ namespace P5CLTCONV
                                 }
                             }
 
-                        }
-
-                    }
-                }
-                else if ((arg0.Extension ==".ftd") && (arg0.Name.Contains("fldSaveDataPlace")))
-                {
-                    Console.WriteLine($"Attempting to convert { arg0.Name }");
-
-                    using (BinaryObjectReader P5RNameFile = new BinaryObjectReader(args[0], Endianness.Big, Encoding.GetEncoding(932)))
-                    {
-
-                        var savePath = Path.Combine(Path.GetDirectoryName(args[0]), "ConvertedOutput");
-                        System.IO.Directory.CreateDirectory(savePath);
-                        savePath = Path.Combine(savePath, Path.GetFileNameWithoutExtension(arg0.FullName) + Path.GetExtension(arg0.Extension));
-
-                        using (BinaryObjectWriter NewNameFile = new BinaryObjectWriter(savePath, Endianness.Big, Encoding.GetEncoding(932)))
-                        {
-                            for (int i = 0; i < 9; i++)
-                            {
-                                NewNameFile.Write(P5RNameFile.ReadUInt32());
-                            }
-                            uint DataSize = P5RNameFile.ReadUInt32();
-                            uint EntryCount = P5RNameFile.ReadUInt32();
-                            uint EntrySize = DataSize / EntryCount;
-                            DataSize = ((EntrySize - 16) * EntryCount);
-                            NewNameFile.Write(DataSize);
-                            NewNameFile.Write(EntryCount);
-                            NewNameFile.Write(P5RNameFile.ReadUInt32());
-                            for (int i = 0; i < EntryCount; i++)
-                            {
-                                for (int j = 0; j < 9; j++)
-                                {
-                                    NewNameFile.Write(P5RNameFile.ReadUInt32());
-                                }
-
-                                for (int j = 0; j < 4; j++)
-                                {
-                                    P5RNameFile.ReadUInt32();
-                                }
-                            }
                         }
 
                     }
