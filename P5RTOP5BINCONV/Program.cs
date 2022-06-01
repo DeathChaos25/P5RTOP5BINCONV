@@ -110,7 +110,9 @@ namespace P5RTOP5BINCONV
                                     NewCLTFile.Write(P5RCLTFile.ReadSingle()); // f32 Quat_Rotation_X;
                                     NewCLTFile.Write(P5RCLTFile.ReadSingle()); // f32 Quat_Rotation_Y;
                                     NewCLTFile.Write(P5RCLTFile.ReadSingle()); // f32 Quat_Rotation_Z;
-                                    NewCLTFile.Write(P5RCLTFile.ReadUInt16()); // u16 Field0C<comment= "Unknown Conditional" >;
+                                    ushort cond = P5RCLTFile.ReadUInt16();
+                                    NewCLTFile.Write(cond); // u16 Field0C<comment= "Unknown Conditional" >;
+                                    Console.WriteLine(cond);
                                     NewCLTFile.Write(P5RCLTFile.ReadUInt16()); // u16 Field0E;
                                     if (CLTVersion >= 0x17020600) // P5R only, skip
                                     {
@@ -914,7 +916,11 @@ namespace P5RTOP5BINCONV
                                 }
 
                             }
-
+                            long remainingFileLength = P5RSPDFile.Length - NewSPDFile.Length;
+                            for (int i = 0; i < remainingFileLength; i++)
+                            {
+                                NewSPDFile.Write(P5RSPDFile.ReadByte());
+                            }
                         }
 
                     }
@@ -959,35 +965,6 @@ namespace P5RTOP5BINCONV
                                 }
                             }
 
-                        }
-
-                    }
-                }
-                else if ((arg0.Extension == ".dat") && (arg0.Name.Contains("speaker")))
-                {
-                    Console.WriteLine($"Attempting to convert { arg0.Name }");
-
-                    using (BinaryObjectReader P5RNameFile = new BinaryObjectReader(args[0], Endianness.Big, Encoding.GetEncoding(932)))
-                    {
-
-                        var savePath = Path.Combine(Path.GetDirectoryName(args[0]), "ConvertedOutput");
-                        System.IO.Directory.CreateDirectory(savePath);
-                        savePath = Path.Combine(savePath, Path.GetFileNameWithoutExtension(arg0.FullName) + Path.GetExtension(arg0.Extension));
-
-                        using (BinaryObjectWriter NewNameFile = new BinaryObjectWriter(savePath, Endianness.Big, Encoding.GetEncoding(932)))
-                        {
-                            for (int i = 0; i < arg0.Length / 48; i++)
-                            {
-                                for (int j = 0; j < 8; j++)
-                                {
-                                    NewNameFile.Write(P5RNameFile.ReadUInt32());
-                                }
-
-                                for (int j = 0; j < 4; j++)
-                                {
-                                    P5RNameFile.ReadUInt32();
-                                }
-                            }
                         }
 
                     }
