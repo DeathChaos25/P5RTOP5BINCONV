@@ -949,23 +949,19 @@ namespace P5RTOP5BINCONV
                                 int value = P5RPCDFile.ReadInt32();
                                 if (i == 1)
                                 {
-                                    NewPCDFile.Write((int)P5RPCDFile.Length + 12);
+                                    NewPCDFile.Write((int)P5RPCDFile.Length + 4);
                                 }
                                 else
                                 {
                                     NewPCDFile.Write(value);
                                 }
                             }
-                            for (int j = 0; j < (P5RPCDFile.Length - 58) / 4; j++)
+                            for (int j = 0; j < (P5RPCDFile.Length - 56) / 4; j++)
                             {
                                 Single valuef = P5RPCDFile.ReadSingle();
-                                if (j != 6 && j != 7)
+                                if (j != 8 && j != 6 && j != 7)
                                 {
                                     NewPCDFile.Write(valuef);
-                                }
-                                if (j == 1)
-                                {
-                                    P5RPCDFile.ReadSingle();
                                 }
                             }
 
