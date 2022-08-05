@@ -15,7 +15,7 @@ Currently supports the following file formats:
 - fldBGMCnd FTD file
 - Field pac hit collision files (.HTB)
 - texture/icon SPD files
-- field pac camera PCD files (experimental)
+- field pac camera PCD files
 - Field Environment .ENV files
 - speaker.dat
 - fldSaveDataPlace.ftd

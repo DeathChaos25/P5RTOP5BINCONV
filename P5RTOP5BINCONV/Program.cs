@@ -938,34 +938,29 @@ namespace P5RTOP5BINCONV
 
                         using (BinaryObjectWriter NewPCDFile = new BinaryObjectWriter(savePath, Endianness.Big, Encoding.GetEncoding(932)))
                         {
-                            NewPCDFile.Write(1179665220); // File header
+                            NewPCDFile.Write(1179665220); // File header (FPCD)
                             P5RPCDFile.ReadInt32();
                             P5RPCDFile.ReadInt32();
-                            NewPCDFile.Write(16777220);
+                            NewPCDFile.Write(16777220); // 01 00 00 04 (Version number)?
 
                             for (int i = 0; i < 12; i++)
                             {
-
                                 int value = P5RPCDFile.ReadInt32();
                                 if (i == 1)
                                 {
-                                    NewPCDFile.Write((int)P5RPCDFile.Length + 12);
+                                    NewPCDFile.Write((int)P5RPCDFile.Length + 4);
                                 }
                                 else
                                 {
                                     NewPCDFile.Write(value);
                                 }
                             }
-                            for (int j = 0; j < (P5RPCDFile.Length - 58) / 4; j++)
+                            for (int j = 0; j < (P5RPCDFile.Length - 56) / 4; j++)
                             {
                                 Single valuef = P5RPCDFile.ReadSingle();
-                                if (j != 6 && j != 7)
+                                if (j != 8 && j != 6 && j != 7)
                                 {
                                     NewPCDFile.Write(valuef);
-                                }
-                                if (j == 1)
-                                {
-                                    P5RPCDFile.ReadSingle();
                                 }
                             }
 
