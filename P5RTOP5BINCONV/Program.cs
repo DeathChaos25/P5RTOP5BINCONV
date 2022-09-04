@@ -936,12 +936,20 @@ namespace P5RTOP5BINCONV
                         System.IO.Directory.CreateDirectory(savePath);
                         savePath = Path.Combine(savePath, Path.GetFileNameWithoutExtension(arg0.FullName) + ".PCD");
 
+                        P5RPCDFile.At(4, SeekOrigin.Begin);
+                        int version = P5RPCDFile.ReadInt32();
+                        if (version == 67108865)
+                        {
+                            Console.WriteLine("Invalid Version");
+                            return;
+                        }
+                        P5RPCDFile.At(0, SeekOrigin.Begin);
                         using (BinaryObjectWriter NewPCDFile = new BinaryObjectWriter(savePath, Endianness.Big, Encoding.GetEncoding(932)))
                         {
                             NewPCDFile.Write(1179665220); // File header (FPCD)
                             P5RPCDFile.ReadInt32();
-                            P5RPCDFile.ReadInt32();
                             NewPCDFile.Write(16777220); // 01 00 00 04 (Version number)?
+                            P5RPCDFile.ReadInt32();
 
                             for (int i = 0; i < 12; i++)
                             {
