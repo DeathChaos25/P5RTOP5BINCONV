@@ -948,8 +948,10 @@ namespace P5RTOP5BINCONV
                         {
                             NewPCDFile.Write(1179665220); // File header (FPCD)
                             P5RPCDFile.ReadInt32();
+                            byte pcdVersion = P5RPCDFile.ReadByte(); //5 removes the first float, 6 removes the first 3
+                            P5RPCDFile.ReadByte();
+                            P5RPCDFile.ReadInt16();
                             NewPCDFile.Write(16777220); // 01 00 00 04 (Version number)?
-                            P5RPCDFile.ReadInt32();
 
                             for (int i = 0; i < 12; i++)
                             {
@@ -966,7 +968,7 @@ namespace P5RTOP5BINCONV
                             for (int j = 0; j < (P5RPCDFile.Length - 56) / 4; j++)
                             {
                                 Single valuef = P5RPCDFile.ReadSingle();
-                                if (j != 8 && j != 6 && j != 7)
+                                if ((j != 8 || pcdVersion == 5) && j != 6 && (j != 7 || pcdVersion == 5))
                                 {
                                     NewPCDFile.Write(valuef);
                                 }
